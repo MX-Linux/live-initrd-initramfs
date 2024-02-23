@@ -13,6 +13,8 @@ antix_specific_code() {
 
     rm -f $dir/etc/fstab.hotplug
     
+    ln -s /run/initramfs $dir/live
+    
     local protect=$dir/etc/live/protect
     mkdir -p $protect
     touch $protect/persist $protect/remaster
