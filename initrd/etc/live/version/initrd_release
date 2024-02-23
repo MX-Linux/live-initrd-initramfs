@@ -1,0 +1,9 @@
+NAME="MX"
+VERSION="23.2 (Libretto)"
+ID="mx"
+VERSION_ID="23.2"
+PRETTY_NAME="MX 23.2 (Libretto)"
+ANSI_COLOR="0;34"
+HOME_URL="https://mxlinux.org"
+BUG_REPORT_URL="https://mxlinux.org"
+BASE=MX
