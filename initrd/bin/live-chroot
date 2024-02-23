@@ -4,15 +4,15 @@ prog=${1:-/bin/sh}
 
 [ $# -gt 0 ] && shift
 
-mkdir -p /live/sys /live/proc /live/dev
+mkdir -p /run/initramfs/sys /run/initramfs/proc /run/initramfs/dev
 
-mountpoint -q /live/sys  || mount --bind /sys  /live/sys
-mountpoint -q /live/proc || mount --bind /proc /live/proc
-mountpoint -q /live/dev  || mount --bind /dev  /live/dev
+mountpoint -q /run/initramfs/sys  || mount --bind /sys  /run/initramfs/sys
+mountpoint -q /run/initramfs/proc || mount --bind /proc /run/initramfs/proc
+mountpoint -q /run/initramfs/dev  || mount --bind /dev  /run/initramfs/dev
 
 chroot /live $prog "$@"
 
-umount /live/dev
-umount /live/sys
-umount /live/proc
+umount /run/initramfs/dev
+umount /run/initramfs/sys
+umount /run/initramfs/proc
 

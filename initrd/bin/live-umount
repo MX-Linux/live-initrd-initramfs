@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 # This script plays some tricks in order to umount the aufs and associated
 # filesystems.  It also ejects the cd/dvd, if needed, and finally it either
@@ -11,10 +11,10 @@
 # Instructions: exec this script from inside the last /etc/init.d script and
 # use --umount:
 #
-#   targ=/live/bin/live-umount [ -x $targ ] \
+#   targ=/run/initramfs/bin/live-umount [ -x $targ ] \
 #       && exec $targ --umount </dev/console >/dev/console 2>&1
 #
-# The script grabs the runlevel Then we umount /live/aufs since this was a
+# The script grabs the runlevel Then we umount /run/initramfs/aufs since this was a
 # convenience bind-mount anyway and it is going to be the target for our
 # pivot_root.  Then we pivot_root so what was /live becomes / and what was /
 # becomes /aufs.  Then we put a copy of ourselves in /sbin/init and call
@@ -86,6 +86,7 @@ TBAR="----------------------------------------------------------------------"
 # Dispatch.  Note that only the init process has a pid of 1.
 #------------------------------------------------------------------------------
 main() {
+	test -e /live && rm /live
     [ $$ = 1 ] && do_init
 
     local NO_PROMPT DO_PROMPT LANG TO_EJECT VERBOSE MSG_CO ME_CO FROM_FILE
@@ -114,14 +115,14 @@ do_scripts() {
     breakpoint s1 "Before running scripts"
 
     # run the brightness shutdown script when using sysvinit
-    if ! test -e /live/config/systemd; then
+    if ! test -e /run/initramfs/config/systemd; then
         if test -x /etc/init.d/brightness; then
             /etc/init.d/brightness stop
         fi
     fi
 
-    if test -e /live/config/remasterable; then
-        seed_file=$(cat /live/config/seed-file 2>/dev/null)
+    if test -e /run/initramfs/config/remasterable; then
+        seed_file=$(cat /run/initramfs/config/seed-file 2>/dev/null)
         prep_seed_dev_random "$seed_file"
     fi
 
@@ -129,9 +130,9 @@ do_scripts() {
     # echo
     #find_mounted_cd $BOOT_DEV_FILE
     local scripts=
-    [ -e /live/config/remasterable ] && scripts="$scripts live-usb-save"
-    [ -e /live/config/save-persist ] && scripts="$scripts persist-autosave"
-    [ -e /live/config/static-root  ] && scripts="$scripts live-static-shutdown"
+    [ -e /run/initramfs/config/remasterable ] && scripts="$scripts live-usb-save"
+    [ -e /run/initramfs/config/save-persist ] && scripts="$scripts persist-autosave"
+    [ -e /run/initramfs/config/static-root  ] && scripts="$scripts live-static-shutdown"
 
     # Only say we are running scripts if we actually run at least one script
     [ "$scripts" ] || return
@@ -290,11 +291,12 @@ do_umountfs() {
     # pivot so what was / ---> /aufs and /live ---> /
     $BUSYBOX_BIN/pivot_root . aufs
 
+	rm /live
     mkdir -p /live /dev /sbin /etc
     cp $OLD_ROOT/etc/fstab /etc
 
-    # Ensure #!/live/bin/sh still works
-    ln -sf /bin /live/bin
+    # Ensure #!/run/initramfs/bin/sh still works
+    ln -sf /bin /run/initramfs/bin
 
     # Copy ourselves to run as the init program when it restarts
     cp /bin/$me /sbin/init
@@ -670,7 +672,7 @@ find_mounted_cd() {
     if test -r $file; then
         dev=$(cat $file 2>/dev/null)
     else
-        eval $(grep ^BOOT_DEV= /live/config/initrd.out)
+        eval $(grep ^BOOT_DEV= /run/initramfs/config/initrd.out)
         dev=$BOOT_DEV
     fi
 
@@ -800,7 +802,7 @@ get_seconds() {
 #------------------------------------------------------------------------------
 read_xlat() {
     local prog=$1 lang=$2 locale_dir=$LOCALE_DIR
-    [ -d $locale_dir ] || locale_dir=/live$locale_dir
+    [ -d $locale_dir ] || locale_dir=/run/initramfs$locale_dir
     local xdir=$locale_dir/xlat fdir=$locale_dir/fonts
 
     local xlat=$xdir/en/$prog.xlat

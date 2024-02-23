@@ -20,7 +20,7 @@ Read_Mounts
 }
 
 move_mountpoints() {
-    local dir mp old aufs_live=/live/aufs/live
+    local dir mp old aufs_live=/run/initramfs/aufs/live
     
     [ -d $aufs_live ] || return
 
@@ -28,7 +28,7 @@ move_mountpoints() {
         [ "$dir" = "aufs" ] && continue
         mp=$aufs_live/$dir
         mountpoint -q $mp || continue
-        old=/live/$dir
+        old=/run/initramfs/$dir
         mkdir -p $old
         echo mount --move $mp $old
         mount --move $mp $old

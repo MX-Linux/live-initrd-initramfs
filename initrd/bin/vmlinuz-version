@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 # See Documentation/x86/boot.txt in Linux source
 

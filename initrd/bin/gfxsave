@@ -23,7 +23,7 @@ CPIO_LIST="top-cpio gfx-cpio gfx1-cpio"
 # Allow over-ride via environment
 : ${UNAME_R:=$(uname -r)}
 
-WORK_DIR=/live/temp/$ME
+WORK_DIR=/run/initramfs/temp/$ME
 
 main() {
     local top_dir=${1%/boot}  gfx_cmd=$2

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-: ${CHDIR:=/live/aufs}
+: ${CHDIR:=/run/initramfs/aufs}
 path=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 
 [ $# -gt 0 ] || exit

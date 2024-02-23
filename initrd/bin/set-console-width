@@ -27,9 +27,9 @@
 ME=${0##*/}
 
 DEF_SCREEN_WIDTH=120
-FONT_DIRS="/usr/share/consolefonts /live/locale/fonts"
+FONT_DIRS="/usr/share/consolefonts /run/initramfs/locale/fonts"
 CONF_FILE="/etc/default/console-setup"
-LOG_FILE="/live/config/font"
+LOG_FILE="/run/initramfs/config/font"
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
 
@@ -41,7 +41,7 @@ set_console_font() {
         [ -z "$DEBUG" ] && AUTO=true
         label=$2
         local param val
-        for param in $(cat /live/config/proc-cmdline /live/config/cmdline 2>/dev/null); do
+        for param in $(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline 2>/dev/null); do
             val=${param#*=}
             case $param in
                     lang=*)      lang=$val  ;;
@@ -85,7 +85,7 @@ set_console_font() {
     # gzipped in the initrd.  This actually makes the initrd.gz *smaller*.
     local ext=.psf.gz
     case $fdir in
-        /live/*) ext=.psf ;;
+        /run/initramfs/*) ext=.psf ;;
     esac
 
 

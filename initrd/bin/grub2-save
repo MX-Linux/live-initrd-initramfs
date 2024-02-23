@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 ME=${0##*/}
 
@@ -8,7 +8,7 @@ ME=${0##*/}
      ARCH_PAE="pae"
   ARCH_NO_PAE="non-pae"
 
-PATH=$PATH:bin:/live/bin
+PATH=$PATH:bin:/run/initramfs/bin
 
 CUSTOM_COMMENT="#--custom"
 DEFAULT_RESOLUTION="1024x768"
@@ -200,7 +200,7 @@ Read_File
 
 gather_params() {
     local p out
-    for p in $(cat /live/config/proc-cmdline /live/config/cmdline 2>/dev/null) $*; do
+    for p in $(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline 2>/dev/null) $*; do
         case $p in
                   menus|menus=*) MENUS=$p ;;
                      bp=*|upb=*)          ;;
@@ -227,7 +227,7 @@ gather_params() {
 }
 
 get_current_vmlinuz() {
-    local initrd_file=/live/config/initrd.out
+    local initrd_file=/run/initramfs/config/initrd.out
     test -r $initrd_file                  || return 1
 
     eval $(egrep -r "^(BOOT_MP|SQFILE_DIR)=" $initrd_file)

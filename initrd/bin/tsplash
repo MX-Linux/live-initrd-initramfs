@@ -1,4 +1,4 @@
-#!/live/bin/bash
+#!/run/initramfs/bin/bash
 
 #==============================================================================
 # Create a text based "splash screen" for starting live MX/antiX
@@ -24,7 +24,7 @@ RAW_Y0=1
 Y0=1
 X0=1
 
-CONF_FILE="/live/etc/tsplash.conf"
+CONF_FILE="/run/initramfs/etc/tsplash.conf"
 
 PROG_BAR_PAUSE="1"
 
@@ -35,8 +35,8 @@ SHOW_NAV=true
 MAX_PROGRESS=7
 PROG_CHARS=4
 
-LOCALE_DIR=/live/locale
-CONF_DIR=/live/config
+LOCALE_DIR=/run/initramfs/locale
+CONF_DIR=/run/initramfs/config
 WORK_DIR=$CONF_DIR/tsplash
 LANG_FILE=$CONF_DIR/lang
 
@@ -52,7 +52,7 @@ LANG_FILE=$CONF_DIR/lang
 C_DOT="\u2022"
 C_DOT="•"
 
-FONT_DIRS="/usr/share/consolefonts /live/locale/fonts"
+FONT_DIRS="/usr/share/consolefonts /run/initramfs/locale/fonts"
 
 USB_DIRTY_BYTES=20000000
 
@@ -63,7 +63,7 @@ main() {
     local cmd=$1 ; shift
     unset START_X
 
-    PATH=$PATH:/live/bin
+    PATH=$PATH:/run/initramfs/bin
 
     stty cbreak -echo
 
@@ -83,7 +83,7 @@ main() {
     log_it 'cmd: %s' "$cmd $*"
 
     # Read back our configuration
-    /live/bin/bash -n $MY_CONF_FILE 2>/dev/null 1>/dev/null && . $MY_CONF_FILE
+    /run/initramfs/bin/bash -n $MY_CONF_FILE 2>/dev/null 1>/dev/null && . $MY_CONF_FILE
 
     read_xlat $ME $LANG
 
@@ -168,7 +168,7 @@ do_final() {
 #------------------------------------------------------------------------------
 do_start() {
     local param=$1
-    # Set up files under /live/config/tsplash
+    # Set up files under /run/initramfs/config/tsplash
 
     rm -rf   "$WORK_DIR"
     mkdir -p "$WORK_DIR"
@@ -177,7 +177,7 @@ do_start() {
 
     printf  "[%8s] Started %s with '%s'\n" "$start_t" "$ME" "$param" >> $LOG_FILE
 
-    test -r $CONF_FILE && /live/bin/bash -n $CONF_FILE &>/dev/null && . $CONF_FILE
+    test -r $CONF_FILE && /run/initramfs/bin/bash -n $CONF_FILE &>/dev/null && . $CONF_FILE
 
     # Read back what we stored when we started
     LANG=$(cat $LANG_FILE 2>/dev/null)
@@ -856,7 +856,7 @@ mk_swap_file() {
 #------------------------------------------------------------------------------
 prog_dd() {
     local dest=$1  cnt=$2  src=${3:-/dev/zero}  bs=${4:-1M}
-    local err_file=/live/dd-copy-failed
+    local err_file=/run/initramfs/dd-copy-failed
     # TEST directories or fatal error
 
     mkdir -p "$(dirname "$dest")"

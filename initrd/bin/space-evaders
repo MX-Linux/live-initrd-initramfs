@@ -2,8 +2,8 @@
 
 ME=${0##*/}
 
-[ -x /live/bin/busybox -a -z "$NO_LOOP" ] \
-    && PATH=/live/bin NO_LOOP=true exec /live/bin/sh $0 "$@"
+[ -x /run/initramfs/bin/busybox -a -z "$NO_LOOP" ] \
+    && PATH=/run/initramfs/bin NO_LOOP=true exec /run/initramfs/bin/sh $0 "$@"
 
 old_stty=$(stty -g)
 

@@ -38,8 +38,8 @@ main() {
 
 prep() {
     case $ME in
-         aufs-*) dir=/live/aufs  ;;
-        linux-*) dir=/live/linux ;;
+         aufs-*) dir=/run/initramfs/aufs  ;;
+        linux-*) dir=/run/initramfs/linux ;;
     esac
 
     LD_DIR=$dir
