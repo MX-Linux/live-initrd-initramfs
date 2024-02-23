@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-deb-install
@@ -13,7 +13,7 @@
 
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 
-. /live/lib/live-init-utils.sh
+. /run/initramfs/lib/live-init-utils.sh
 start_init_logging
 
 main() {
@@ -26,7 +26,7 @@ main() {
 }
 
 do_start() {
-    . /live/config/initrd.out
+    . /run/initramfs/config/initrd.out
     local deb_dir=$SQFILE_DIR/deb
     test -d $deb_dir || return
     ls $deb_dir/*.deb &>/dev/null || return

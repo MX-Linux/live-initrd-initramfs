@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-toram-eject
@@ -24,12 +24,12 @@ main() {
 }
 
 do_start() {
-    #. /live/lib/live-init-utils.sh
+    #. /run/initramfs/lib/live-init-utils.sh
 
-    test -e /live/config/toram-eject || return
+    test -e /run/initramfs/config/toram-eject || return
 
     local param runlevel=5
-    : ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline)}
+    : ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline)}
     for param in $CMDLINE; do
         case $param in
             [0-9]) runlevel=$param;;

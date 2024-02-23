@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:         live-restore-services
@@ -32,11 +32,11 @@ case "$1" in
         ;;
 esac
 
-from=/live/config/disabled-rc.d
+from=/run/initramfs/config/disabled-rc.d
 
 [ -d $from ] || exit 0
 
-. /live/lib/live-init-utils.sh
+. /run/initramfs/lib/live-init-utils.sh
 
 start_init_logging
 load_translation

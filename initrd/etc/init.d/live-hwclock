@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-hwclock
@@ -18,12 +18,12 @@ TZ_FILE=/etc/timezone
 
 MARGIN=$((15 * 60))   # 15 Minutes
 
-. /live/lib/live-init-utils.sh
+. /run/initramfs/lib/live-init-utils.sh
 start_init_logging
 #load_translation
 
 #-jbb For debugging
-: ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline)}
+: ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline)}
 for param in $CMDLINE; do
     value=${param#*=}
     case "$param" in
@@ -54,7 +54,7 @@ do_start() {
 
    check_rtc || exit 2
 
-   mountpoint -q /live/aufs || PRETEND_MODE=true
+   mountpoint -q /run/initramfs/aufs || PRETEND_MODE=true
    [ "$PRETEND_MODE" ] && echo_live "${YELLOW}Pretend mode enabled"
 
     case $CMD_CLOCK in
@@ -141,18 +141,18 @@ set_timezone() {
         pretend write_to_file $TZ_FILE $tz
         pretend cp -f $(readlink -f $zone_file) /etc/localtime
         # For localizing repos in live-init
-        pretend append_file /live/config/cmdline "tz=$tz"
+        pretend append_file /run/initramfs/config/cmdline "tz=$tz"
     else
         error "Unknown time zone %s" "$(wq $tz)"
     fi
 }
 
 select_timezone() {
-    local DISTRO distro_file=/live/config/distro
+    local DISTRO distro_file=/run/initramfs/config/distro
     read DISTRO 2>/dev/null < $distro_file
     : ${DISTRO:=antiX}
 
-    local BOOT_MENU_DIR=/live/menus DO_MENUS=t
+    local BOOT_MENU_DIR=/run/initramfs/menus DO_MENUS=t
     my_select_menu "Select Timezone" "Timezones are listed by longitude" t tz
     [ "$tz" = "default" ] && tz=$TZ
     TZ=${tz#tz=}

@@ -1,4 +1,4 @@
-#!/live/bin/sh
+#!/run/initramfs/bin/sh
 
 #==============================================================================
 # Update the bootloader configurations to save the current boot parameters
@@ -9,11 +9,11 @@
 # The tricky part is if encryption or frugal were used then we need to mount
 # the BIOS boot partition and update the bootloaders there.
 #==============================================================================
-export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/live/bin
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/run/initramfs/bin
 
 BOOT_UUID_FNAME="bios-dev-uuid"
 
-. /live/lib/live-init-utils.sh
+. /run/initramfs/lib/live-init-utils.sh
 
 start_init_logging
 
@@ -31,7 +31,7 @@ main() {
 
 do_start() {
 
-    : ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline)}
+    : ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline)}
     local gfx_cmd boot_save  vga_cmd  vga_ask
     for param in $CMDLINE; do
         local value=${param#*=}
@@ -56,26 +56,26 @@ do_start() {
 
     [ -n "$gfx_cmd$boot_save$grub_save" ] || return
 
-    if ! [ -e /live/config/remasterable ]; then
+    if ! [ -e /run/initramfs/config/remasterable ]; then
         echo_live "Can't update %s on read-only boot media" "$(pquote gfxboot)"
         return 1
     fi
 
-    # Start with the default mountpoint at /live/boot-dev
+    # Start with the default mountpoint at /run/initramfs/boot-dev
     BOOT_LOADER_MP=$BOOT_MP
 
-    # Change to /live/bios if needed (changed the called scripts)
+    # Change to /run/initramfs/bios if needed (changed the called scripts)
     local uuid_file="$SQFILE_DIR/$BOOT_UUID_FNAME"
     if ! mount_boot_partition "$uuid_file"; then
         error "Could not mount the BIOS boot partition"
         exit 1
     fi
 
-    test -d /live/config/tsplash && DO_TSPLASH=true
+    test -d /run/initramfs/config/tsplash && DO_TSPLASH=true
     tsplash_alert "Save boot parameters"
 
     if [ -n "$gfx_cmd" ]; then
-        local script=/live/bin/gfxsave
+        local script=/run/initramfs/bin/gfxsave
         local dir=$BOOT_LOADER_MP/boot
         local env="GFX_LOG_FILE=/var/log/live/gfxsave.log VERBOSE=7"
         #echo $script $dir $gfx_cmd
@@ -175,9 +175,9 @@ get_real_vga_code() {
     local dec_code=$((hex_code))
 
     echo_live "Using boot parameter %s" "$(pquote vga=$dec_code)"
-    local p_cmdline=/live/config/proc-cmdline
+    local p_cmdline=/run/initramfs/config/proc-cmdline
     sed -r "s/(^| )(vga=)[^ ]*/\1\2$dec_code/" $p_cmdline > $p_cmdline.2
-    CMDLINE=$(cat $p_cmdline.2 /live/config/cmdline 2>/dev/null)
+    CMDLINE=$(cat $p_cmdline.2 /run/initramfs/config/cmdline 2>/dev/null)
 
     return 0
 }
@@ -203,9 +203,9 @@ old_get_real_vga_code() {
     echo_live "Found hex code %s" "$(pquote $vga_hex)"
     local vga_dec=$(($vga_hex % 0x1000 + 0x200))
     echo_live "Using boot parameters %s" "$(pquote vga=$vga_dec)"
-    local p_cmdline=/live/config/proc-cmdline
+    local p_cmdline=/run/initramfs/config/proc-cmdline
     sed -r "s/(^| )(vga=)[^ ]*/\1\2$vga_dec/" $p_cmdline > $p_cmdline.2
-    CMDLINE=$(cat $p_cmdline.2 /live/config/cmdline 2>/dev/null)
+    CMDLINE=$(cat $p_cmdline.2 /run/initramfs/config/cmdline 2>/dev/null)
 }
 
 
@@ -254,7 +254,7 @@ mount_boot_dev() {
 #------------------------------------------------------------------------------
 tsplash_alert() {
     [ "$DO_TSPLASH" ] || return
-    /live/bin/tell-tsplash alert "$*"
+    /run/initramfs/bin/tell-tsplash alert "$*"
 }
 
 
