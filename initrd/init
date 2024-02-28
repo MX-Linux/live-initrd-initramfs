@@ -6467,7 +6467,7 @@ confile() {
 #
 #------------------------------------------------------------------------------
 write_output_files() {
-    local dir=$1  out_file=$1/initrd.out pattern1="$LIVE_DIR" pattern2="/FINAL_DIR"
+    local dir=$1  out_file=$1/initrd.out pattern1="$LIVE_DIR" pattern2="/$FINAL_DIR"
     mkdir -p $dir
     #rm -f $dir/* 2>/dev/null
 
