@@ -4,7 +4,7 @@
 
 ME=${0##*/}
 
-CPIO_FILE=/run/initramfs/boot-dev/boot/syslinux/gfx-cpio
+CPIO_FILE=/live/boot-dev/boot/syslinux/gfx-cpio
 CPIO_DIR=./gfx-cpio-dir
 REPACK_ARGS="-o --owner root:root --quiet"
 UNPACK_ARGS="-idum --quiet"

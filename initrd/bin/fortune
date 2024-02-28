@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PATH=/run/initramfs/bin:/bin
+PATH=/live/bin:/bin
 dir=/usr/share/fortune
 
 name=$1

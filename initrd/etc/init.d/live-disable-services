@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-disable-services
@@ -13,7 +13,7 @@
 
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 
-OUT_FILE=/run/initramfs/config/disabled
+OUT_FILE=/live/config/disabled
 PAM_FILE=/etc/pam.d/login
 
 VBOX_SERVICES="
@@ -114,8 +114,8 @@ NO_DBUS_SERVICES="
     dbus
 "
 
-PATH=/run/initramfs/bin:$PATH
-. /run/initramfs/lib/live-init-utils.sh
+PATH=/live/bin:$PATH
+. /live/lib/live-init-utils.sh
 
 start_init_logging
 load_translation
@@ -134,7 +134,7 @@ main() {
 
 do_start() {
     local must_run param val
-    : ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline /run/initramfs/config/cmdline3 2>/dev/null)}
+    : ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline /live/config/cmdline3 2>/dev/null)}
 
     for param in $CMDLINE; do
         val=${param#*=}
@@ -204,7 +204,7 @@ do_start() {
     esac
 
     if test -e /etc/init.d/virtualbox-guest-utils; then
-        if test -e /run/initramfs/config/virtualbox; then
+        if test -e /live/config/virtualbox; then
             echo_live "$_Enabling_X_service_" "$(pquote Virtual Box)"
             update-rc.d virtualbox-guest-utils defaults
             test -e /etc/init.d/virtualbox-guest-x11 && update-rc.d virtualbox-guest-x11 defaults
@@ -306,7 +306,7 @@ disable_services() {
 
     for rc_dir in /etc/$rc_dirs; do
 
-        dest=/run/initramfs/config/disabled-rc.d/${rc_dir#/etc/}
+        dest=/live/config/disabled-rc.d/${rc_dir#/etc/}
         mkdir -p $dest
 
         for service in $services; do
@@ -351,7 +351,7 @@ disable_pam_login() {
     #egrep -q '^[[[:space:]]*session[[:space:]]+[^[:space:]]+[[:space:]]+pam_lastlog.so[[:space:]]+silent' $PAM_FILE
     #local silent_pam=$?
 
-    if grep -q "^PERSISTENCE=.*root" /run/initramfs/config/initrd.out; then
+    if grep -q "^PERSISTENCE=.*root" /live/config/initrd.out; then
         # On persistent systems enable lastlog but disable MOTD
         sed -r -i \
             -e 's/^\s*(session\s+[^\s]+\s+pam_lastlog.so).*/\1/'         \

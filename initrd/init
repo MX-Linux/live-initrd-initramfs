@@ -157,14 +157,14 @@ KMS_VIDEO_MODULES="amdgpu,analogix-anx78xx,ast,bochs-drm,ch7006,cirrus,gma500_gf
       DID_EFI_FILE="boot/grub/config/did-efi-grub"
      EFI_GRUB_CONF="boot/grub/config/efi-grub.cfg"
     UEFI_UUID_FILE="antiX/esp-uuid"
-         SWAP_FILE="/run/initramfs/boot-dev/swap-file"
+         SWAP_FILE="/live/boot-dev/swap-file"
    USB_DIRTY_BYTES=20000000
 
      LIVE_LOGS_DIR="live-logs"
 
        TSPLASH_TTY=10
             MY_TTY=1
-   VCARD_CONF_FILE="/run/initramfs/config/vcard-cmd"
+   VCARD_CONF_FILE="/live/config/vcard-cmd"
 
          CRYPT_TAB=""
 
@@ -335,7 +335,7 @@ main_wrapper() {
             for dir in config bin; do
                 local new_dir=$NEW_ROOT/etc/live/$dir
                 mkdir -p $new_dir
-                mount --bind /run/initramfs/aufs/live/$dir $new_dir
+                mount --bind /live/aufs/live/$dir $new_dir
             done
 
             # Leave ext2/3/4 as read-write
@@ -348,7 +348,7 @@ main_wrapper() {
     fi
 
     local f rm_list
-    for f in $NEW_ROOT/run/initramfs/menus/*; do
+    for f in $NEW_ROOT/live/menus/*; do
         case $f in *tz.*) continue;; esac
         rm_list="$rm_list $f"
     done
@@ -360,9 +360,9 @@ main_wrapper() {
         cp $BLACK_LIST_FILE $modprobe_d
     fi
 
-    dmesg > $NEW_ROOT/run/initramfs/config/dmesg.out
+    dmesg > $NEW_ROOT/live/config/dmesg.out
 
-    [ "$DO_TSPLASH" ] && openvt -w -c $TSPLASH_TTY /live/tsplash progress  "$_start_init_"
+    [ "$DO_TSPLASH" ] && openvt -w -c $TSPLASH_TTY /live/bin/tsplash progress  "$_start_init_"
 
     breakpoint 9     "right before starting init"
 
@@ -611,7 +611,7 @@ main_core() {
     local sbin_init=$(readlink $NEW_ROOT/sbin/init)
     if [ -n "$sbin_init" -a -z "${sbin_init##*systemd}" ]; then
         SYSTEM_D=true
-        touch /run/initramfs/config/systemd
+        touch /live/config/systemd
         msg  "$_Detected_X_init_system_" $(cq systemd)
     fi
 
@@ -1036,7 +1036,7 @@ read_cmdline_params()
         [sS1-6]|BOOT_IMAGE=*);;
 
         #------------------------------------------------------------------------
-        # NOTE: see /run/initramfs/custom/$DISTRO_NAME/0.sh for distro specific boot codes
+        # NOTE: see /live/custom/$DISTRO_NAME/0.sh for distro specific boot codes
         # and a massive list of known kernel and module parameters
         #------------------------------------------------------------------------
 
@@ -1353,7 +1353,7 @@ do_welcome() {
 
     if lspci -n | grep -iq " 80ee:beef"; then
         vmsg 7 'VirtualBox detected'
-        touch /run/initramfs/config/virtualbox
+        touch /live/config/virtualbox
     fi
 
     local bat_stat=$(battery-status | sed "s/:/:$hi_co/" )
@@ -2741,7 +2741,7 @@ fancy_set_new_passphrase() {
 
     elif [ "$use_phrase" ]; then
         msg 'Using passphrase %s' "$(bq "$use_phrase")"
-        [ "$DB_PLUS" ] && echo -n "$use_phrase" > /run/initramfs/config/passphrase
+        [ "$DB_PLUS" ] && echo -n "$use_phrase" > /live/config/passphrase
         printf "%s" "$use_phrase" | cryptsetup luksChangeKey --key-file $file $dev 2>&1 || return $?
     else
         fatal 'Internal error setting new passphrase'
@@ -2804,7 +2804,7 @@ load_microcode() {
     [ -z "$NO_MICRO_CODE" -a -e "$mc_file" ] || return
     msg "Load microcode"
     mkdir /lib/firmware
-    mount --bind /run/initramfs/aufs/lib/firmware /lib/firmware
+    mount --bind /live/aufs/lib/firmware /lib/firmware
     echo 1 > $mc_file
     #sleep 0.1
     umount /lib/firmware
@@ -3731,7 +3731,7 @@ _error() {
 #
 #------------------------------------------------------------------------------
 move_mountpoints() {
-    local dir mp old aufs_live=/run/initramfs/aufs$FINAL_DIR
+    local dir mp old aufs_live=/live/aufs$FINAL_DIR
 
     [ -d $aufs_live ] || return
 
@@ -3739,7 +3739,7 @@ move_mountpoints() {
         [ "$dir" = aufs ] && continue
         mp=$aufs_live/$dir
         mountpoint -q $mp || continue
-        old=/run/initramfs/$dir
+        old=/live/$dir
         mkdir -p $old
         # echo mount --move $mp $old
         mount --move $mp $old
@@ -4123,7 +4123,7 @@ xlat_mfile() {
 #
 #------------------------------------------------------------------------------
 do_early_menus() {
-    local BOOT_MENU_DIR=/run/initramfs/menus
+    local BOOT_MENU_DIR=/live/menus
     local MENU_VALUE BOOT_MENU_WARN=true
     local lang time_zone option persist desktop
     local cmdline
@@ -4162,27 +4162,27 @@ do_early_menus() {
     my_select_menu  "$_Select_Persistence_Option_" ""                                      p persist   "$_Persistence_"   'persist_*|frugal_*'
     my_select_menu  "$_Select_font_size_"           "$_Scale_fonts_in_graphics_display_Default_is_1_0_"  f fontsize "X font size" 'fontsize=*'
     #vmsg 6 "cmdline:$white $cmdline"
-    [ ${#cmdline} -gt 0 ] && echo "$cmdline" >> /run/initramfs/config/cmdline
+    [ ${#cmdline} -gt 0 ] && echo "$cmdline" >> /live/config/cmdline
 }
 
 #------------------------------------------------------------------------------
 #
 #------------------------------------------------------------------------------
 do_late_menus() {
-    local BOOT_MENU_DIR=/run/initramfs/aufs/usr/local/share/boot-menus
+    local BOOT_MENU_DIR=/live/aufs/usr/local/share/boot-menus
     local BOOT_MENU_WARN=
     local lang time_zone option persist desktop
     local cmdline
     my_select_menu  "$_Select_Desktop_" "" d desktop  "$_Desktop_" 'desktheme=*'
 
     if remasterable; then
-        BOOT_MENU_DIR=/run/initramfs/menus
+        BOOT_MENU_DIR=/live/menus
         my_select_menu  "$_Save_these_changes_" "" s save  "$_Save_"
         echo "$cmdline" | grep -q bootsave && BOOT_SAVE=true
     fi
 
     #vmsg 6 "cmdline:$white $cmdline"
-    [ ${#cmdline} -gt 0 ] && echo "$cmdline" >> /run/initramfs/config/cmdline
+    [ ${#cmdline} -gt 0 ] && echo "$cmdline" >> /live/config/cmdline
 }
 
 
@@ -6257,7 +6257,7 @@ fancy_prompt() {
 LESS="-R -i"
 [ -r $fp_prog ] && source $fp_prog
 [ -n "\$(alias $cmd)" ] && $prompt
-echo \$PATH | grep -q /run/initramfs/bin || PATH=\$PATH:/etc/live/bin
+echo \$PATH | grep -q /live/bin || PATH=\$PATH:/etc/live/bin
 Fancy_Stuff
 
     fi
@@ -6282,7 +6282,7 @@ copy_xtra() {
         gunzip -c "$tarball" | tar x -C $NEW_ROOT/
     fi
 
-    local live_xtra='/run/initramfs/xtra'
+    local live_xtra='/live/xtra'
 
     if  [ -d "$live_xtra" -a ! -d "$xtra_dir" ]; then
         msg 'Copy xtra file(s) from %s' "$(fq "$live_xtra")"
@@ -6456,7 +6456,7 @@ chroot_umount() {
 #
 #------------------------------------------------------------------------------
 confile() {
-    local file dir=/run/initramfs/config
+    local file dir=/live/config
     for file; do
         test -e $dir/$file && return 0
     done
@@ -6467,7 +6467,7 @@ confile() {
 #
 #------------------------------------------------------------------------------
 write_output_files() {
-    local dir=$1  out_file=$1/initrd.out pattern1="/live" pattern2="/run/initramfs"
+    local dir=$1  out_file=$1/initrd.out pattern1="$LIVE_DIR" pattern2="/FINAL_DIR"
     mkdir -p $dir
     #rm -f $dir/* 2>/dev/null
 
@@ -6606,7 +6606,7 @@ write_log_files() {
 }
 
 #------------------------------------------------------------------------------
-# Make a copy of /var/log/run/initramfs/ at /root/Live-usb-storage/live-logs
+# Make a copy of /var/log/live/ at /root/Live-usb-storage/live-logs
 # Backup the previous version with a .old extension.
 #------------------------------------------------------------------------------
 copy_live_logs() {
@@ -6623,7 +6623,7 @@ copy_live_logs() {
     [ -e $targ_live ] && mv $targ_live $targ_old
 
     cp -r $new_root$log_dir $targ_live
-    [ "$DB_PLUS" ] && cp -r $new_root/run/initramfs/config $targ_live/
+    [ "$DB_PLUS" ] && cp -r $new_root/live/config $targ_live/
 }
 
 #------------------------------------------------------------------------------
@@ -6674,7 +6674,7 @@ run_init_scripts() {
 
     local script full now last_time=$(get_time)
     for script; do
-        full=/run/initramfs/etc/init.d/$script
+        full=$FINAL_DIR/etc/init.d/$script
         test -x $new_root/$full || continue
         $SET_ARCH chroot $new_root $full start
         [ "$DB_PLUS" ] || continue
@@ -6684,8 +6684,8 @@ run_init_scripts() {
     done
 
     #-jbb # Do a persist-save to save new passwords and persist save mode
-    #-jbb [ -f $new_root/run/initramfs/config/new-passwords       ] || return
-    #-jbb [ -f $new_root/run/initramfs/config/persist-save.conf   ] || return
+    #-jbb [ -f $new_root/live/config/new-passwords       ] || return
+    #-jbb [ -f $new_root/live/config/persist-save.conf   ] || return
 
     #-jbb local persist_save=/usr/local/bin/persist-save
     #-jbb [ -x $new_root$persist_save                    ] || return
@@ -6779,11 +6779,11 @@ detect_old_persist_scripts() {
     local enabled_file=$root/usr/local/bin/persist-enabled
 
     if [ -e $lib_file ]; then
-        head -n 20 $lib_file | grep -q /etc/run/initramfs/config || return 0
+        head -n 20 $lib_file | grep -q /etc/live/config || return 0
     fi
 
     if [ -e $enabled_file ]; then
-        grep -q /etc/run/initramfs/config $enabled_file || return 0
+        grep -q /etc/live/config $enabled_file || return 0
     fi
 
     return 1
@@ -6825,7 +6825,7 @@ late_umount() {
 
     # If this was the encrypted device then close the mapping
     [ "$dev" = "$CRYPT_DEV" ] || return
-    log_cmd $SET_ARCH chroot /run/initramfs/aufs /sbin/cryptsetup close "$LUKS_NAME"
+    log_cmd $SET_ARCH chroot /live/aufs /sbin/cryptsetup close "$LUKS_NAME"
 }
 
 #------------------------------------------------------------------------------
@@ -6861,7 +6861,7 @@ fix_old_lum() {
     vmsg 7 'EFI UUID: %s' "$efi_uuid"
     [ ${#efi_uuid} -gt 0 ] || return 1
 
-    local efi_mp=/run/initramfs/efi
+    local efi_mp=/live/efi
     mkdir -p $efi_mp
     local dev=$(uuid_to_dev $efi_uuid)
     vmsg 7 'EFI device; %s'  "$dev"
@@ -7052,7 +7052,7 @@ prepare_switch_root() {
     local root_dir=""
 
     # FIXME!
-    #new_live=$new_root/run/initramfs
+    # new_live=$new_root/run/initramfs
 
     # Now tell kernel where the real modprobe lives
     echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
@@ -7075,7 +7075,7 @@ prepare_switch_root() {
 
     local f
     for f in README LICENSE; do
-        local from=/run/initramfs/$f  to=$new_root/run/initramfs/$f
+        local from=/live/$f  to=$new_root/run/initramfs/$f
         test -e $from || continue
         test -e $to   && continue
         cp $from $to
@@ -7144,7 +7144,7 @@ prepare_switch_root() {
 # runlevel 3.
 #------------------------------------------------------------------------------
 remove_from_runlevel() {
-    local prog=$1  level=${2:-3}  root=${3:-/run/initramfs/aufs}
+    local prog=$1  level=${2:-3}  root=${3:-/live/aufs}
     test -d $root || root=
     local file=$root/etc/init.d/$prog
     msg "file: $file"

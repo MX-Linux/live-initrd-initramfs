@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-L10n
@@ -22,7 +22,7 @@ case "$1" in
 esac
 
 # For debugging
-: ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline /run/initramfs/config/cmdline2)}
+: ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline /live/config/cmdline2)}
 
 for param in $CMDLINE; do
     case $param in
@@ -45,7 +45,7 @@ umask 022
 trap "" 2 3 11
 
 # . /usr/share/antiX/lib/live-init-utils.sh
-. /run/initramfs/lib/live-init-utils.sh
+. /live/lib/live-init-utils.sh
 
 start_init_logging
 load_translation

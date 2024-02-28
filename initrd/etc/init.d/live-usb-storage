@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-usb-storage
@@ -16,7 +16,7 @@ STORAGE_BIND=Live-usb-storage
 
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 
-. /run/initramfs/lib/live-init-utils.sh
+. /live/lib/live-init-utils.sh
 start_init_logging
 load_translation
 
@@ -31,7 +31,7 @@ main() {
 
 do_start() {
 
-    test -e /run/initramfs/config/remasterable || exit 0
+    test -e /live/config/remasterable || exit 0
 
     . $INITRD_OUT
 
@@ -72,7 +72,7 @@ do_start() {
 
 do_stop() {
 
-    test -e /run/initramfs/config/remasterable || exit 0
+    test -e /live/config/remasterable || exit 0
 
     echo_script "$_Disabling_live_usb_storage_" $0
 
@@ -157,7 +157,7 @@ Home_Ents
 }
 
 read_cmdline() {
-    : ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline2)}
+    : ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline2)}
     local param
     for param in $CMDLINE; do
         value=${param#*=}

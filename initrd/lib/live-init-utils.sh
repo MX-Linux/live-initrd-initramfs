@@ -7,9 +7,9 @@
 #          protecting files from being written to more than once.
 
 
-INIT_LANG_DIR=/run/initramfs/locale/init-lang
+INIT_LANG_DIR=/live/locale/init-lang
 #INIT_XLAT_DIR=/usr/share/antiX/init-xlat
-INIT_XLAT_DIR=/run/initramfs/locale/xlat
+INIT_XLAT_DIR=/live/locale/xlat
 
 DISABLED_RC_DIR=/etc/live/disabled-rc.d
 
@@ -20,7 +20,7 @@ REMASTER_PROTECT_FILE=$PROTECT_DIR/remaster
 _INIT_LOG_FILE=/var/log/live/live-init.log.color
 INIT_LOG_FILE=/dev/null
 
-for live_config in /run/initramfs/config/initrd.out /run/initramfs/config/linuxrc.out; do
+for live_config in /live/config/initrd.out /live/config/linuxrc.out; do
     test -r $live_config || continue
     INITRD_OUT=$live_config
     break
@@ -33,7 +33,7 @@ export TEXTDOMAINDIR=/usr/share/locale
 
 IVERBOSE=5
 
-: ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline /run/initramfs/config/cmdline2 >/dev/null)}
+: ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline /live/config/cmdline2 >/dev/null)}
 for param in $CMDLINE; do
     case "$param" in
     verbose=[0-9]|verb=[0-9]) IVERBOSE=${param#*=}     ;;
@@ -46,8 +46,8 @@ for param in $CMDLINE; do
     esac
 done
 
-test -e /run/initramfs/config/low-color && COLOR_LOW=true
-test -e /run/initramfs/config/no-color  && COLOR_OFF=true
+test -e /live/config/low-color && COLOR_LOW=true
+test -e /live/config/no-color  && COLOR_OFF=true
 
 if ! [ "$COLOR_OFF" ]; then
     NO_COLOR="[0m"
@@ -174,7 +174,7 @@ get_init_lang() {
 
     # echo_live 'Setting language via: %s' $(pquote lang=$lang)
     . $lang_file
-    cp $lang_file /run/initramfs/config/lang
+    cp $lang_file /live/config/lang
     return 0
 }
 

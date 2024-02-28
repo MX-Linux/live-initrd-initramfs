@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:         live-vcard
@@ -13,20 +13,20 @@
 ### END INIT INFO
 
 
-export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/run/initramfs/bin
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/live/bin
 
-test -d /run/initramfs/config/tsplash && DO_TSPLASH=true
+test -d /live/config/tsplash && DO_TSPLASH=true
 
- VCARD_CONF_FILE="/run/initramfs/config/vcard-cmd"
+ VCARD_CONF_FILE="/live/config/vcard-cmd"
 XORG_BUS_ID_FILE="/etc/X11/xorg-bus-id"
     DISABLE_FILE="/lib/modprobe.d/video-card-disable.conf"
-    #DISABLE_FILE="/run/initramfs/test/video-card-disable.conf"
-VIDEO_TWEAKS_FILE="/run/initramfs/config/video-tweaks"
+    #DISABLE_FILE="/live/test/video-card-disable.conf"
+VIDEO_TWEAKS_FILE="/live/config/video-tweaks"
 
 # Save machine-state file from previous boots
   VCARD_MODE_FILE="/var/lib/live-mstate/vcard-mode"
 
-. /run/initramfs/lib/live-init-utils.sh
+. /live/lib/live-init-utils.sh
 start_init_logging
 # FIXME: load_translation
 
@@ -182,7 +182,7 @@ do_start() {
     echo
 
     if tsplash_enabled; then
-        #/run/initramfs/bin/tell-tsplash alert "$(printf "Using card %s" "$new_card")"
+        #/live/bin/tell-tsplash alert "$(printf "Using card %s" "$new_card")"
         tsplash-on
     fi
 }
@@ -262,7 +262,7 @@ get_card() {
 #------------------------------------------------------------------------------
 lspci_graphics() {
     #lspci "$@"
-    local file  dir=/run/initramfs/boot-dev/test
+    local file  dir=/live/boot-dev/test
     case $1 in
         -nn) file=$dir/lspci-nn ;;
     -nk|-kn) file=$dir/lspci-nk ;;
@@ -447,7 +447,7 @@ check_switcheroo() {
 setting_bus_id() {
     local bus_id=$1
     echo_live "Setting Xorg bus-id to  %s" "$(pquote $bus_id)"
-    echo "xorg=busid=$bus_id" >> /run/initramfs/config/cmdline2
+    echo "xorg=busid=$bus_id" >> /live/config/cmdline2
 }
 #------------------------------------------------------------------------------
 #

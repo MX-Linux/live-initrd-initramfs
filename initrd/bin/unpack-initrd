@@ -16,7 +16,7 @@ VERSION_DATE="Fri Apr  2 08:35:35 PM MDT 2021"
 
 ME=${0##*/}
 
-INITRD_FILE="/run/initramfs/boot-dev/antiX/initrd.gz"
+INITRD_FILE="/live/boot-dev/antiX/initrd.gz"
 INITRD_DIR="./initrd"
 REPACK_ARGS="-o -H newc --owner root:root --quiet"
 UNPACK_ARGS="-idum --quiet"
@@ -348,7 +348,7 @@ repack_initrd() {
         cmd rm -f "$file"
     fi
 
-    local INITRD_XTRA_DIR="$dir/run/initramfs/xtra"
+    local INITRD_XTRA_DIR="$dir/live/xtra"
     if [ -n "$XTRA_DIR" ]; then
         test -d "$XTRA_DIR" || fatal "Xtra dir %s is not a directory" "$(pqw "$XTRA_DIR")"
         local xtra_size=$(du -scm "$XTRA_DIR" | tail -n1 | cut -f1)

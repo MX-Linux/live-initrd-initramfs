@@ -5,7 +5,7 @@ find_console_font() {
     
     local name=Terminus
 
-    #dir=~/Projects/antiX/Live-initrd/run/initramfs/locale/fonts
+    #dir=~/Projects/antiX/Live-initrd/live/locale/fonts
 
     # Note, always round down to make max-size easier to find
     local size size2

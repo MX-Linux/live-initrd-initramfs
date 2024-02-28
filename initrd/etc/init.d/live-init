@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-init
@@ -12,14 +12,14 @@
 # Description: localize /etc/skel, create /home/demo, customize X, mirrors, set default desktop
 ### END INIT INFO
 
-export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/run/initramfs/bin
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/live/bin
 
 MAKE_FSTAB="make-fstab"
-test -e "/run/initramfs/bin/make-fstab" && MAKE_FSTAB="/run/initramfs/bin/make-fstab"
+test -e "/live/bin/make-fstab" && MAKE_FSTAB="/live/bin/make-fstab"
 
      AUTOMOUNT=
  FOUND_VDRIVER=
- VERSION_FILES="/etc/antix-version /run/initramfs/boot-dev/version"
+ VERSION_FILES="/etc/antix-version /live/boot-dev/version"
 
   NON_KMS_MODULES_REGEX="i810|sis[_-]agp|via[_-]agp"
 
@@ -44,22 +44,22 @@ NETWORK_IF_FILE="/etc/network/interfaces"
 LIVE_MNT_DIR="/media"
 SPLASH_PROGRAMS="/sbin/splash-all /sbin/splash-term /usr/local/bin/splash-select /etc/udev/rules.d/*-fbcondecor.rules"
 
-SWAP_FILE="/run/initramfs/boot-dev/swap-file"
+SWAP_FILE="/live/boot-dev/swap-file"
 
 DEFAULT_VDRIVER="vesa"
 UEFI_VDRIVER="fbdev"
 
-VIDEO_TWEAKS_FILE="/run/initramfs/config/video-tweaks"
+VIDEO_TWEAKS_FILE="/live/config/video-tweaks"
 XORG_BUS_ID_FILE="/etc/X11/xorg-bus-id"
 
-if test -e /run/initramfs/config/uefi; then
+if test -e /live/config/uefi; then
     UEFI_BOOT=true
     DEFAULT_VDRIVER=$UEFI_VDRIVER
 fi
 
 
 #-jbb For testing can set CMDLINE=xxx in environment
-: ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline /run/initramfs/config/cmdline2)}
+: ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline /live/config/cmdline2)}
 
 for param in $CMDLINE; do
     value=${param#*=}
@@ -111,7 +111,7 @@ done
 
 umask 022
 
-. /run/initramfs/lib/live-init-utils.sh
+. /live/lib/live-init-utils.sh
 
 start_init_logging
 load_translation
@@ -184,7 +184,7 @@ do_start() {
     # Unless NO_LOAD_KEYS
     [ -z "$NO_LOAD_KEYS" ] && set_keyboard "${DISTRO_BASE:=$DISTRO}"
 
-    if [ -e /run/initramfs/config/virtualbox -a -z "$VBOX_DECOR" ]; then
+    if [ -e /live/config/virtualbox -a -z "$VBOX_DECOR" ]; then
         echo_live "$_Disabling_splash_fbcondecor_inside_of_Virtual_Box_"
         rm -f $SPLASH_PROGRAMS
     fi
@@ -300,7 +300,7 @@ do_start() {
             if [ -z "$XORG_DRIVER" -a -z "$SAFE_VIDEO" ]; then
                 if have_chrome_gpu_and_driver; then
                     echo_live "$_Letting_X_server_default_to_X_driver_" "$(pquote openchrome)"
-                elif test -e /run/initramfs/config/virtualbox; then
+                elif test -e /live/config/virtualbox; then
                     echo_live "$_No_default_X_in_Virtual_Box_" "$(pquote xorg.conf)"
                 elif [ -z "$XORG_DRIVER" ]; then
                     echo_live "$_Forcing_X_server_to_use_X_driver_" "$(pquote $DEFAULT_VDRIVER)"
@@ -371,8 +371,8 @@ create_fstab() {
 
     # first see if we should add a swap file
     local swap_opts  remasterable  file=$SWAP_FILE
-    test -e /run/initramfs/config/remasterable && remasterable=true
-    test -e /run/initramfs/config/did-toram    && NO_SWAP_FILE=true
+    test -e /live/config/remasterable && remasterable=true
+    test -e /live/config/did-toram    && NO_SWAP_FILE=true
     if [ -z "$NO_SWAP_FILE" -a -n "$remasterable" -a -w "$file" ]; then
         if file -b "$file" | grep -q "^data$"; then
             echo_live "$_Running_X_on_Y_" "$(pquote mkswap)" "$(pquote $file)"
@@ -387,7 +387,7 @@ create_fstab() {
     fi
 
     # disable swap if encrypted or we have a swap file or user requested no swap
-    if [ -e /run/initramfs/config/encrypted -o -n "$DID_SWAP_FILE" -o -n "$NO_SWAP" ]; then
+    if [ -e /live/config/encrypted -o -n "$DID_SWAP_FILE" -o -n "$NO_SWAP" ]; then
         # But "live_swap=force" overrides all of the above
         [ -z "$FORCE_SWAP" ] && swap_opts="$swap_opts --no-swap"
     fi
@@ -521,7 +521,7 @@ automount_and_fstab() {
     # NOTE: we are disabling with both the rules file and the .hotplug file
     # Tell rc.local to enable fstab hotplugging by copying back the rules
     # file and touching the .hotplug file
-    touch /run/initramfs/config/fstab-hotplug
+    touch /live/config/fstab-hotplug
 }
 
 #-------------------------------------------------------------------------------
@@ -1073,7 +1073,7 @@ write_issue_file() {
     [ "$force" -o ! -e $file ] || return
 
     local pretty_name  installer=cli-installer  cli_cc=antiX-cli-cc
-    read pretty_name 2>/dev/null </run/initramfs/config/pretty-name
+    read pretty_name 2>/dev/null </live/config/pretty-name
     : ${pretty_name:=$distro}
 
     which $installer &>/dev/null || installer=
@@ -1086,7 +1086,7 @@ write_issue_file() {
     (   imsg "Welcome to %s! Powered by %s" "$(iq $pretty_name)" "$(iq Debian)."
         if [ -n "$installer" ]; then
             echo
-            if test -e /run/initramfs/config/persist-root; then
+            if test -e /live/config/persist-root; then
                 imsg "For command line install, login as %s." "$(iq root)"
             else
                 imsg "For command line install, login as %s (password=%s)." "$(iq root)" "$(iq root)"

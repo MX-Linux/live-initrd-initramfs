@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH=/sbin:/bin/:/usr/sbin:/usr/bin:/run/initramfs/bin
+PATH=/sbin:/bin/:/usr/sbin:/usr/bin:/live/bin
 
 tty=10
 

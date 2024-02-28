@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          live-static-shutdown
@@ -25,7 +25,7 @@ main() {
 }
 
 do_stop() {
-    . /run/initramfs/lib/live-init-utils.sh
+    . /live/lib/live-init-utils.sh
     #load_translation
     echo_script "clean up static rootfs" $0
 
@@ -33,12 +33,12 @@ do_stop() {
 
     #-jbb if which auplink 2>/dev/null; then
     #-jbb     echo_live "Cleaning aufs"
-    #-jbb     auplink /run/initramfs/aufs flush
+    #-jbb     auplink /live/aufs flush
     #-jbb fi
 }
 
 delete_static_rootfs() {
-    test -e /run/initramfs/config/static-rootfs || return
+    test -e /live/config/static-rootfs || return
     echo_live "Delete files from static root"
     echo rm -rf $(grep -v "^\s*#" $LIST_FILE | sed -r -e 's/\s+#.*//' | grep "/[a-zA-Z0-9]")
 }

@@ -2,7 +2,7 @@
 
 gather_frugal_cmdline() {
     local p out value
-    for p in $(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline 2>/dev/null) $*; do
+    for p in $(cat /live/config/proc-cmdline /live/config/cmdline 2>/dev/null) $*; do
         value=${p#*=}
         case $p in
                 frugal=*) p=persist=$value      ;;

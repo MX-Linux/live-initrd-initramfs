@@ -11,7 +11,7 @@
 # Description:       save/restore some information on raw liveusb w/o persistence
 ### END INIT INFO
 
-LINUXFS_DIR="/run/initramfs/linux"
+LINUXFS_DIR="/live/linux"
 
 MSTATE_FILES="# File: machine-state-files
 # Machine specific files to be saved across reboots
@@ -76,10 +76,10 @@ DS_FILE="/home/%s/.desktop-session/default-desktop"
 DS_DIR="/home/%s/.desktop-session"
 BLACK_LIST_FILE=/etc/modprobe.d/live-blacklist.conf
 
-TORAM_FILE=/run/initramfs/config/did-toram
+TORAM_FILE=/live/config/did-toram
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 
-. /run/initramfs/lib/live-init-utils.sh
+. /live/lib/live-init-utils.sh
 
 . $INITRD_OUT
 
@@ -105,7 +105,7 @@ main() {
 do_start() {
     local cmd=${1:-start}
 
-    test -e /run/initramfs/config/remasterable || exit 0
+    test -e /live/config/remasterable || exit 0
     read_cmdline
 
     local bdir root_dir
@@ -132,7 +132,7 @@ do_start() {
     # enabled
     # Not saving state when I enable persistence was a pain.
     # We'll see.  Maybe just restore it the first time?!
-    #test -e /run/initramfs/config/persist-root && return
+    #test -e /live/config/persist-root && return
 
     file_list=$(state_files "$GSTATE_FILES" | sed "s|^\s*/||")
     restore_state $root_dir/$GSTATE_DIR "$file_list" "" $cmd
@@ -144,7 +144,7 @@ do_start() {
 
 do_stop() {
 
-    test -e /run/initramfs/config/remasterable || exit 0
+    test -e /live/config/remasterable || exit 0
     read_cmdline
 
     local root_dir=$SQFILE_DIR
@@ -304,7 +304,7 @@ save_state() {
     for file in $file_list; do
 
         # Don't save from /live
-        [ -z "${file##/run/initramfs/*}" ] && continue
+        [ -z "${file##/live/*}" ] && continue
 
         local from=$file
         local to=$state_dir/files$file
@@ -388,7 +388,7 @@ restore_state() {
             local to=${from#$state_dir/files}
 
             # Don't write to /live or /sys
-            [ -z "${to##/run/initramfs/*}" ] && continue
+            [ -z "${to##/live/*}" ] && continue
 
             if [ "$SYS_MODE" ]; then
                 test -e $to   || continue
@@ -488,7 +488,7 @@ mount_boot_dev() {
 }
 
 read_cmdline() {
-    : ${CMDLINE:=$(cat /run/initramfs/config/proc-cmdline /run/initramfs/config/cmdline /run/initramfs/config/cmdline2)}
+    : ${CMDLINE:=$(cat /live/config/proc-cmdline /live/config/cmdline /live/config/cmdline2)}
     local param
     for param in $CMDLINE; do
         value=${param#*=}

@@ -1,4 +1,4 @@
-#!/run/initramfs/bin/sh
+#!/live/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          persist-autosave
@@ -11,19 +11,19 @@
 # Description:       Run persist-config on startup if needed.  Run persist-save if needed
 ### END INIT INFO
 
-export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/run/initramfs/bin
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/live/bin
 
 # We need this to know if we should chvt 1 for semi-auto save
 # And know if we need to chvt 1 at startup
-PERSIST_CONF=/etc/run/initramfs/persist-config.conf
+PERSIST_CONF=/etc/live/persist-config.conf
 
-test -d /run/initramfs/config/tsplash && DO_TSPLASH=true
-TSPLASH_TTY_NUM_FILE=/run/initramfs/config/tsplash/tty-num
+test -d /live/config/tsplash && DO_TSPLASH=true
+TSPLASH_TTY_NUM_FILE=/live/config/tsplash/tty-num
 
 # . /usr/share/antiX/lib/live-init-utils.sh
-. /run/initramfs/lib/live-init-utils.sh
+. /live/lib/live-init-utils.sh
 
-read DISTRO 2>/dev/null </run/initramfs/config/distro
+read DISTRO 2>/dev/null </live/config/distro
 case $DISTRO in
     [mM][xX]*) LOCKOUT_TIME=60 ;;
             *) LOCKOUT_TIME=15 ;;
@@ -31,7 +31,7 @@ esac
 
 start_init_logging
 load_translation
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/run/initramfs/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/live/bin
 
 [ "$LIB_CMD_LANG" ] && export LANG=$LIB_CMD_LANG.UTF-8
 
@@ -46,7 +46,7 @@ main() {
 }
 
 do_start() {
-    local new_passwd=/run/initramfs/config/new-passwords
+    local new_passwd=/live/config/new-passwords
 
     # Bail early if no persist-config is needed
     if [ -e $PERSIST_CONF ]; then
@@ -75,12 +75,12 @@ do_start() {
 #------------------------------------------------------------------------------
 do_stop() {
     # bail early
-    [ -e /run/initramfs/config/save-persist ] || return
+    [ -e /live/config/save-persist ] || return
     echo_script "$_Possibly_save_persistent_information_" $0
 
     # Don't auto-save twice in a row
-    local last_as_file=/run/initramfs/config/last-auto-save
-    local last_ps_file=/run/initramfs/config/last-persist-save
+    local last_as_file=/live/config/last-auto-save
+    local last_ps_file=/live/config/last-persist-save
 
     local file prev now=$(date +%s)
     for file in $last_as_file $last_ps_file; do
@@ -129,7 +129,7 @@ tsplash_clear() {
 #------------------------------------------------------------------------------
 tsplash_alert() {
     [ "$DO_TSPLASH" ] || return
-    /run/initramfs/bin/tell-tsplash alert "$*"
+    /live/bin/tell-tsplash alert "$*"
 }
 
 #------------------------------------------------------------------------------
