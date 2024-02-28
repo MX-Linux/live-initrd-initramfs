@@ -6467,7 +6467,7 @@ confile() {
 #
 #------------------------------------------------------------------------------
 write_output_files() {
-    local dir=$1  out_file=$1/initrd.out
+    local dir=$1  out_file=$1/initrd.out pattern1="/live" pattern2="/run/initramfs"
     mkdir -p $dir
     #rm -f $dir/* 2>/dev/null
 
