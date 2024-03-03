@@ -13,6 +13,9 @@ antix_specific_code() {
 
     rm -f $dir/etc/fstab.hotplug
     
+    #remove leftover /live directory (after switch_root)
+    rm -R $dir/live
+    #symlink /live to FINAL_DIR location after switch_root
     ln -s /run/initramfs $dir/live
     
     local protect=$dir/etc/live/protect

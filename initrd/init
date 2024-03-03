@@ -645,7 +645,8 @@ main_core() {
     write_output_files $OUTPUT_DIR
     update_store_file "$NO_STORE" "$DO_STORE"
 
-    mkdir -p $NEW_ROOT/etc/live
+    #ensure certain direcotries exist, including FINAL_DIR
+    mkdir -p $NEW_ROOT/etc/live $NEW_ROOT$FINAL_DIR
 
     echo $FINAL_DIR > $NEW_ROOT/etc/live/live-dir
 
