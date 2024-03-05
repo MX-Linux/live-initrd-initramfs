@@ -333,16 +333,17 @@ main_wrapper() {
 
             local dir new_dir
             for dir in config bin; do
-                local new_dir=$NEW_ROOT/etc/live/$dir
+                local new_dir=$NEW_ROOT/etc$FINAL_DIR/$dir
                 mkdir -p $new_dir
-                mount --bind /live/aufs/live/$dir $new_dir
+                mount --bind /live/aufs$FINAL_DIR/$dir $new_dir
             done
 
             # Leave ext2/3/4 as read-write
-            case $(mntpnt_fstype $NEW_ROOT$BOOT_MP) in
+            echo "BOOT_MP is " "$BOOT_MP"
+            case $(mntpnt_fstype $NEW_ROOT$FINAL_DIR/boot-dev) in
                 ext[234]|iso9660) ;;
                    btrfs|xfs|jfs) ;;
-                               *) chmod 755 $NEW_ROOT/live ;;
+                               *) chmod 755 $NEW_ROOT$FINAL_DIR ;;
             esac
         fi
     fi
