@@ -291,6 +291,13 @@ main_wrapper() {
     breakpoint 8      "before running live init.d scripts"
     breakpoint b8     "Bash shell before running live init.d scripts"
 
+    #ensure symlink exists before running init.d scripts
+
+    #remove leftover /live directory
+    test -d "$NEW_ROOT/live" && rm -R $NEW_ROOT/live
+    #symlink /live to FINAL_DIR location after switch_root
+    ln -s /run/initramfs $NEW_ROOT/live
+
     # I hope this is no longer needed
     # remove_from_runlevel lightdm 3
 
