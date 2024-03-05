@@ -361,7 +361,7 @@ main_wrapper() {
         cp $BLACK_LIST_FILE $modprobe_d
     fi
 
-    dmesg > $NEW_ROOT/live/config/dmesg.out
+    dmesg > $NEW_ROOT$FINAL_DIR/config/dmesg.out
 
     [ "$DO_TSPLASH" ] && openvt -w -c $TSPLASH_TTY /live/bin/tsplash progress  "$_start_init_"
 
